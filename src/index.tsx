@@ -13,6 +13,7 @@ import ReactDOM from 'react-dom';
 import {
   AiFillEdit,
   AiOutlineDollarCircle,
+  AiOutlineGithub,
   AiOutlinePrinter,
   AiOutlineRight,
   AiOutlineShareAlt,
@@ -107,6 +108,12 @@ const Root: React.FC = () => {
               <AiOutlinePrinter />
             </ListItemIcon>
             <ListItemText primary="Print" />
+          </ListItem>
+          <ListItem button onClick={() => window.open(`https://github.com/connor4312/covid-img`)}>
+            <ListItemIcon>
+              <AiOutlineGithub />
+            </ListItemIcon>
+            <ListItemText primary="Source Code" />
           </ListItem>
         </List>
       </Drawer>
