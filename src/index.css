@@ -10,6 +10,12 @@
   width: 100vw;
 }
 
+/* fix for the zoom library truncating on firefox */
+.canvas > div > div {
+  width: -moz-fit-content;
+  height: -moz-fit-content;
+}
+
 .canvas svg {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
