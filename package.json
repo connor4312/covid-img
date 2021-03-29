@@ -1,0 +1,42 @@
+{
+  "name": "covid-img",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "esbuild src/index.tsx --bundle --minify --define:process.env.NODE_ENV=\\\"production\\\" --outdir=out",
+    "watch": "esbuild src/index.tsx --watch --bundle --sourcemap --define:process.env.NODE_ENV=\\\"development\\\" --outdir=out",
+    "fmt": "prettier --write \"src/**/*.{ts,tsx}\""
+  },
+  "author": "Connor Peet <connor@peet.io>",
+  "license": "MIT",
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "arrowParens": "avoid"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.36",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "commander": "^7.2.0",
+    "esbuild": "^0.10.1",
+    "playwright": "^1.10.0",
+    "pngquant-bin": "^6.0.0",
+    "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.11.3",
+    "@types/qrcode": "^1.4.0",
+    "qrcode": "^1.4.4",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-google-font-loader": "^1.1.0",
+    "react-icons": "^4.2.0",
+    "react-use": "^17.2.1",
+    "react-zoom-pan-pinch": "^1.6.1"
+  }
+}
