@@ -132,7 +132,6 @@ export const ConfigurationUI: React.FC<{
         <TextOptionInputs
           config={value}
           value={value.textFlavor}
-          onlyCoordinate
           onChange={textFlavor => onChange({ ...value, textFlavor })}
         />
       </ConfigurationSection>
