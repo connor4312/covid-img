@@ -15,6 +15,7 @@ export const enum ColumnNodeShape {
 
 export interface IColumnLayout {
   type: LayoutType.Column;
+  foreground: string;
   count: number;
   orientation: ColumnOrientation;
   shape: ColumnNodeShape;
@@ -61,18 +62,18 @@ export const makeColumnLayout = (
       key: i,
       box: box(layout, i, data.length, config.nodeRegion),
       seq,
-      config,
+      layout,
     }),
   );
 };
 
-type NodeType = React.FC<{ box: IBox; seq: Seq; config: IConfiguration }>;
+type NodeType = React.FC<{ box: IBox; seq: Seq; layout: IColumnLayout }>;
 
-const CircleNode: NodeType = ({ box, seq, config }) => {
+const CircleNode: NodeType = ({ box, seq, layout }) => {
   let x: number;
   let y: number;
   let maxSize: number;
-  if (config.layout.orientation === ColumnOrientation.Vertical) {
+  if (layout.orientation === ColumnOrientation.Vertical) {
     maxSize = Math.min(box.height, box.width / 5);
     x = box.left + (box.width / 5) * (seq + 0.5);
     y = box.top + box.height / 2;
@@ -85,12 +86,12 @@ const CircleNode: NodeType = ({ box, seq, config }) => {
   return <circle cx={x} cy={y} r={maxSize / 3} />;
 };
 
-const RectNode: NodeType = ({ box, seq, config }) => {
-  if (config.layout.orientation === ColumnOrientation.Vertical) {
+const RectNode: NodeType = ({ box, seq, layout }) => {
+  if (layout.orientation === ColumnOrientation.Vertical) {
     const width = box.width / 4;
     return (
       <rect
-        fill={config.foreground}
+        fill={layout.foreground}
         x={box.left + seq * width}
         y={box.top}
         width={width}
@@ -101,7 +102,7 @@ const RectNode: NodeType = ({ box, seq, config }) => {
     const height = box.height / 4;
     return (
       <rect
-        fill={config.foreground}
+        fill={layout.foreground}
         x={box.left}
         y={box.top + seq * height}
         width={box.width}

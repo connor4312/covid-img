@@ -8,6 +8,17 @@ export interface IBox {
   height: number;
 }
 
+export const fitWithin = (box: IBox, anotherBoxWithAspectRatio: number): IBox => {
+  const ratio = box.width / box.height;
+  if (ratio > anotherBoxWithAspectRatio) {
+    const width = box.height / anotherBoxWithAspectRatio;
+    return { top: box.top, left: box.left + (box.width - width) / 2, width, height: box.height };
+  } else {
+    const height = box.width / anotherBoxWithAspectRatio;
+    return { top: box.top + (box.height - height) / 2, left: box.left, width: box.width, height };
+  }
+};
+
 export type Coordinate = [x: number, y: number];
 
 export const enum Dataset {

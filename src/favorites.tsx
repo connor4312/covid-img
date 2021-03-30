@@ -80,6 +80,7 @@ export const barcode85By11 = (params: URLSearchParams): IConfiguration => {
       orientation: ColumnOrientation.Vertical,
       shape: ColumnNodeShape.Barcode,
       spacing: width * 0.05,
+      foreground: '#000000',
     },
     nodeRegion: {
       left: leftMargin,

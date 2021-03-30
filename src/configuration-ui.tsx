@@ -14,11 +14,15 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
+// todo: types will be published soon
+//@ts-ignore
+import colors from 'colorbrewer';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
   AiOutlineColumnHeight,
   AiOutlineColumnWidth,
   AiOutlineDown,
+  AiOutlineExpandAlt,
   AiOutlineFontSize,
   AiOutlineFunction,
   AiOutlineLineHeight,
@@ -28,6 +32,8 @@ import { Dataset, IBox, IConfiguration } from './configuration';
 import { modernaText, pfizerText } from './descriptions';
 import { defaultLayouts, Layout, LayoutType } from './layout';
 import { ColumnOrientation, IColumnLayout } from './layout-column';
+import { IQrCodeLayout } from './layout-qr';
+import { ISpiralLayout } from './layout-spiral';
 import { ITextOptions, Rotate } from './text';
 
 export const ConfigurationUI: React.FC<{
@@ -132,7 +138,11 @@ export const ConfigurationUI: React.FC<{
       </ConfigurationSection>
 
       <ConfigurationSection label="Layout" expanded>
-        <LayoutEditor value={value.layout} onChange={layout => onChange({ ...value, layout })} />
+        <LayoutEditor
+          config={value}
+          value={value.layout}
+          onChange={layout => onChange({ ...value, layout })}
+        />
       </ConfigurationSection>
     </div>
   );
@@ -188,10 +198,11 @@ let idCounter = 0;
 
 const useUniqueId = () => useMemo(() => `unique-id-${idCounter++}`, []);
 
-const LayoutEditor: React.FC<{ value: Layout; onChange(layout: Layout): void }> = ({
-  value,
-  onChange,
-}) => {
+const LayoutEditor: React.FC<{
+  config: IConfiguration;
+  value: Layout;
+  onChange(layout: Layout): void;
+}> = ({ value, onChange, config }) => {
   return (
     <>
       <Grid item>
@@ -200,23 +211,156 @@ const LayoutEditor: React.FC<{ value: Layout; onChange(layout: Layout): void }> 
           value={value.type}
           onChange={evt => {
             if (evt.target.value !== value.type) {
-              onChange(defaultLayouts[evt.target.value as LayoutType]);
+              onChange(defaultLayouts[evt.target.value as LayoutType](config));
             }
           }}
         >
           <MenuItem value={LayoutType.Column}>Column/Row</MenuItem>
+          <MenuItem value={LayoutType.QR}>QR Code</MenuItem>
+          <MenuItem value={LayoutType.Spiral}>Spiral</MenuItem>
         </Select>
       </Grid>
       {value.type === LayoutType.Column && <ColumnLayoutEditor value={value} onChange={onChange} />}
+      {value.type === LayoutType.QR && <QrCodeEditor value={value} onChange={onChange} />}
+      {value.type === LayoutType.Spiral && (
+        <SpiralEditor config={config} value={value} onChange={onChange} />
+      )}
     </>
   );
 };
+
+const QrCodeEditor: React.FC<{
+  value: IQrCodeLayout;
+  onChange(layout: IQrCodeLayout): void;
+}> = ({ value, onChange }) => (
+  <>
+    <Grid item>
+      <ColorInput
+        label="Foreground"
+        value={value.foreground}
+        onChange={foreground => onChange({ ...value, foreground })}
+      />
+    </Grid>
+    <Grid item>
+      <Select
+        label="Error Correction Level"
+        value={value.ecl}
+        onChange={evt =>
+          onChange({ ...value, ecl: evt.target.value as 'low' | 'medium' | 'high' | 'quartile' })
+        }
+      >
+        <MenuItem value="low">Low</MenuItem>
+        <MenuItem value="medium">Medium</MenuItem>
+        <MenuItem value="quartile">Quartile</MenuItem>
+        <MenuItem value="high">High</MenuItem>
+      </Select>
+    </Grid>
+  </>
+);
+
+const SpiralEditor: React.FC<{
+  config: IConfiguration;
+  value: ISpiralLayout;
+  onChange(layout: ISpiralLayout): void;
+}> = ({ config, value, onChange }) => (
+  <>
+    <ColorThemeEditor value={value.colors} onChange={colors => onChange({ ...value, colors })} />
+    <Grid item>
+      <SliderWithInput
+        value={value.segmentHeight}
+        label="Segment Height"
+        min={1}
+        max={config.nodeRegion.width / 4}
+        step={0.05}
+        onChange={segmentHeight => onChange({ ...value, segmentHeight })}
+        icon={<AiOutlineColumnWidth />}
+      />
+    </Grid>
+    <Grid item>
+      <SliderWithInput
+        value={value.segmentGutter}
+        label="Segment Gutter"
+        min={0}
+        max={value.segmentHeight}
+        step={0.05}
+        onChange={segmentGutter => onChange({ ...value, segmentGutter })}
+        icon={<AiOutlineColumnWidth />}
+      />
+    </Grid>
+    <Grid item>
+      <SliderWithInput
+        value={value.startRadius}
+        label="Inner Radius"
+        min={1}
+        max={config.nodeRegion.width / 4}
+        onChange={startRadius => onChange({ ...value, startRadius })}
+        icon={<AiOutlineExpandAlt />}
+      />
+    </Grid>
+  </>
+);
+
+const ColorThemeEditor: React.FC<{
+  value: ReadonlyArray<string>;
+  onChange(value: string[]): void;
+}> = ({ value, onChange }) => (
+  <>
+    <Grid item>
+      <Select
+        label="Colors"
+        value={value}
+        onChange={evt => onChange(String(evt.target.value).split(','))}
+      >
+        {colors.schemeGroups.qualitative.map((name: string) => (
+          <MenuItem key={name} value={colors[name][4].join(',')}>
+            {name}
+          </MenuItem>
+        ))}
+      </Select>
+    </Grid>
+    <Grid item>
+      <ColorInput
+        label="Adenine Color"
+        value={value[0]}
+        onChange={v => onChange(value.map((c, i) => (i === 0 ? v : c)))}
+      />
+    </Grid>
+    <Grid item>
+      <ColorInput
+        label="Cytosine Color"
+        value={value[1]}
+        onChange={v => onChange(value.map((c, i) => (i === 1 ? v : c)))}
+      />
+    </Grid>
+    <Grid item>
+      <ColorInput
+        label="Uracil Color"
+        value={value[2]}
+        onChange={v => onChange(value.map((c, i) => (i === 2 ? v : c)))}
+      />
+    </Grid>
+    <Grid item>
+      <ColorInput
+        label="Guanine Color"
+        value={value[3]}
+        onChange={v => onChange(value.map((c, i) => (i === 3 ? v : c)))}
+      />
+    </Grid>
+  </>
+);
 
 const ColumnLayoutEditor: React.FC<{
   value: IColumnLayout;
   onChange(layout: IColumnLayout): void;
 }> = ({ value, onChange }) => (
   <>
+    <Grid item>
+      <ColorInput
+        label="Foreground"
+        value={value.foreground}
+        onChange={foreground => onChange({ ...value, foreground })}
+      />
+    </Grid>
     <Grid item>
       <FormControlLabel
         control={
@@ -311,7 +455,7 @@ const TextOptionInputs: React.FC<{
         <Select
           label="Font Weight"
           value={value.fontWeight}
-          onChange={(_evt, fontWeight) => onChange({ ...value, fontWeight: Number(fontWeight) })}
+          onChange={evt => onChange({ ...value, fontWeight: Number(evt.target.value) })}
         >
           <MenuItem value={100}>Thin</MenuItem>
           <MenuItem value={200}>Extra Light</MenuItem>
@@ -340,7 +484,7 @@ const TextOptionInputs: React.FC<{
         <Select
           label="Rotation"
           value={value.rotate ?? Rotate.None}
-          onChange={(_evt, rotate) => onChange({ ...value, rotate: Number(rotate) })}
+          onChange={evt => onChange({ ...value, rotate: Number(evt.target.value) })}
         >
           <MenuItem value={Rotate.None}>None</MenuItem>
           <MenuItem value={Rotate.Clockwise}>Clockwise</MenuItem>
