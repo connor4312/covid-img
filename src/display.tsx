@@ -7,11 +7,17 @@ import { makeLayout } from './layout';
 import { ITextOptions, Paragraph, Text } from './text';
 import { drawerOpenByDefault, drawerWidth } from './theme';
 
-export const Display: React.FC<{ data: SequenceData; config: IConfiguration }> = ({
-  data,
-  config,
-}) => (
-  <svg width={config.width} height={config.height}>
+export const Display: React.FC<{
+  data: SequenceData;
+  config: IConfiguration;
+  scaled?: boolean;
+}> = ({ data, config, scaled }) => (
+  <svg
+    width={config.width}
+    height={config.height}
+    viewBox={scaled ? `0 0 ${config.width} ${config.height}` : undefined}
+    style={scaled ? { maxWidth: '100vw', maxHeight: '100vh' } : undefined}
+  >
     <rect width="100%" height="100%" fill={config.background} />
     {makeLayout(config, data)}
     {config.textMain && <Text {...config.textMain} color={config.foreground} />}

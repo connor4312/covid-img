@@ -13,10 +13,10 @@ async function main(opts) {
   const [rw, rh] = opts.ratio.split(':').map(Number);
   const ratio = rw / rh;
   if (ratio > 1) {
-    height = opts.size;
+    height = +opts.size;
     width = Math.round(opts.size * ratio);
   } else {
-    width = opts.size;
+    width = +opts.size;
     height = Math.round(opts.size / ratio);
   }
 
@@ -31,6 +31,7 @@ async function main(opts) {
 
   const tmpfile = join(os.tmpdir(), `covid-img-${Date.now()}.png`);
   try {
+    await fs.unlink(opts.out).catch(() => {});
     await fs.writeFile(tmpfile, screenshot);
     await promisify(execFile)(pngquant, ['-o', join(process.cwd(), opts.out), tmpfile]);
   } catch (e) {

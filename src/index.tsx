@@ -52,7 +52,7 @@ const Root: React.FC = () => {
     return (
       <>
         <FontLoader config={config} />
-        <Display data={dataset} config={config} />
+        <Display scaled data={dataset} config={config} />
       </>
     );
   }
